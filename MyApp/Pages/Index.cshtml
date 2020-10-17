@@ -4,20 +4,19 @@
     ViewData["Title"] = "Home";
 }
 
-<h1>Movie Box</h1>
+<h1>Forms</h1>
 <hr />
 
 <div id="app">
 
     <div class="card border-primary">
         <div class="card-header">
-            <span v-if="editMode">Edit Movie</span>
-            <span v-else>Add New Movie</span>
+            <span v-if="editMode">Edit Form</span>
+            <span v-else>Add New Form</span>
             
         </div>
         <div class="card-body">
             <input v-model="name" name="Name" placeholder="Name" class="form-control" />
-            <input v-model="year" name="Year" placeholder="Year" class="form-control" />
             <br />
             <button class="btn btn-primary" v-on:click="addMovie" v-if="!editMode"> Add</button>
             <button class="btn btn-secondary" v-on:click="updateMovie" v-if="editMode"> Update</button>
@@ -30,7 +29,6 @@
             <tr>
                 <th>#</th>
                 <th>Name</th>
-                <th>Year</th>
                 <th></th>
             </tr>
         </thead>
@@ -43,7 +41,6 @@
                 <td>
                     {{item.name}}
                 </td>
-                <td> {{item.year}}</td>
                 <td>
                     <button class="btn btn-danger" v-on:click="removeMovie(index,item)">Delete</button>
                     <button class="btn btn-primary" v-on:click="editMovie(index,item)">Edit</button>
@@ -67,7 +64,6 @@
             data: {
                 movieList: [],
                 name: "",
-                year: null,
                 id: null,
                 index: null,
                 editMode:false
@@ -83,7 +79,6 @@
                     vm.editMode = false;
                     vm.id = null;
                     vm.name = "";
-                    vm.year = null;
                     vm.index = null;
                 },
                 updateMovie: function () {
@@ -92,7 +87,6 @@
                     var selectedMovie = {
                         id:vm.id,
                         name: vm.name,
-                        year: vm.year
                     }
 
                     $.ajax({
@@ -103,15 +97,13 @@
                     }).done(function () {
                         console.log("done");
                         vm.movieList[vm.index].name = vm.name;
-                        vm.movieList[vm.index].year = vm.year;
-                        toastr.success("Movie updated.");
+                        toastr.success("updated.");
 
                     }).fail(function () {
-                        toastr.error("Error updating movie!");
+                        toastr.error("Error updating !");
                     }).always(function () {
                         vm.editMode = false;
                         vm.name = "";
-                        vm.year = null;
                     });
 
                
@@ -121,7 +113,6 @@
                     vm.editMode = true;
                     vm.id = selectedMovie.id;
                     vm.name = selectedMovie.name;
-                    vm.year = selectedMovie.year;
                     vm.index = index;
                 },
                 removeMovie: function (index,selectedMovie) {
@@ -136,10 +127,10 @@
                     }).done(function () {
                         console.log("done");
                         vm.movieList.splice(index, 1);
-                        toastr.success("Movie removed.");
+                        toastr.success("removed.");
 
                     }).fail(function () {
-                        toastr.error("Error removing movie!");
+                        toastr.error("Error removing !");
                     });
 
                 },
@@ -148,7 +139,6 @@
 
                     var newMovie = {
                         name: vm.name,
-                        year: vm.year
                     }
 
                     $.ajax({
@@ -159,19 +149,18 @@
                     }).done(function () {
                         console.log("done");
                         vm.movieList.splice(0, 0, newMovie);  
-                        toastr.success("Movie added.");
+                        toastr.success("added.");
 
                     }).fail(function () {
                         toastr.error("Error!");
                     }).always(function () {
                         vm.name = "";
-                        vm.year = null;
                     });
 
                 
                 },
                 getMovieList: function () {
-                    console.log("Getting Movie List");
+                    console.log("Getting List");
 
                     var vm = this;
 

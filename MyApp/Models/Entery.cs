@@ -7,13 +7,21 @@ using System.Threading.Tasks;
 
 namespace MyApp.Models
 {
-    public class Movie
+    public class Entery
+    {
+        public string Id { get; set; }
+
+        public string Name { get; set; }
+    }
+
+    public class DataForm
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
 
         public string Name { get; set; }
-        public int Year { get; set; }
+
+        public IList<Entery> Enteries { get; set; }
     }
 }

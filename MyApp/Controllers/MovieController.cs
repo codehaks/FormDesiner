@@ -13,13 +13,13 @@ namespace MyApp.Controllers
     [ApiController]
     public class MovieController : ControllerBase
     {
-        public IMongoCollection<Movie> Movies { get; }
+        public IMongoCollection<DataForm> Movies { get; }
 
         public MovieController()
         {
             var client = new MongoClient("mongodb://localhost:27017");
-            var db = client.GetDatabase("mymoviesdb");
-            Movies = db.GetCollection<Movie>("movies");
+            var db = client.GetDatabase("formsDb");
+            Movies = db.GetCollection<DataForm>("forms");
         }
         //api/movie
         [HttpGet]
@@ -27,27 +27,27 @@ namespace MyApp.Controllers
         {
 
 
-            var movieList = Movies.Find(FilterDefinition<Movie>.Empty).ToList();
+            var movieList = Movies.Find(FilterDefinition<DataForm>.Empty).ToList();
 
             return Ok(movieList);
         }
 
         [HttpPost]
-        public IActionResult Create([FromBody] Movie model)
+        public IActionResult Create([FromBody] DataForm model)
         {
             Movies.InsertOne(model);
             return Ok();
         }
 
         [HttpDelete] // REST
-        public IActionResult Remove([FromBody] Movie model)
+        public IActionResult Remove([FromBody] DataForm model)
         {
             Movies.DeleteOne(m => m.Id == model.Id);
             return Ok();
         }
 
         [HttpPut]
-        public IActionResult Update([FromBody] Movie model)
+        public IActionResult Update([FromBody] DataForm model)
         {
             Movies.ReplaceOne(m => m.Id == model.Id, model);
             return Ok();
