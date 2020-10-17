@@ -1,0 +1,189 @@
+﻿@page
+@model MyApp.IndexModel
+@{
+    ViewData["Title"] = "Home";
+}
+
+<h1>Movie Box</h1>
+<hr />
+
+<div id="app">
+
+    <div class="card border-primary">
+        <div class="card-header">
+            <span v-if="editMode">Edit Movie</span>
+            <span v-else>Add New Movie</span>
+            
+        </div>
+        <div class="card-body">
+            <input v-model="name" name="Name" placeholder="Name" class="form-control" />
+            <input v-model="year" name="Year" placeholder="Year" class="form-control" />
+            <br />
+            <button class="btn btn-primary" v-on:click="addMovie" v-if="!editMode"> Add</button>
+            <button class="btn btn-secondary" v-on:click="updateMovie" v-if="editMode"> Update</button>
+            <button class="btn btn-outline-primary" v-on:click="cancelEditMovie" v-if="editMode"> Cancel</button>
+        </div>
+    </div>
+
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>Year</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            
+            <tr v-for="(item,index) in movieList">
+                <td>
+                    {{index+1}}
+                </td>
+                <td>
+                    {{item.name}}
+                </td>
+                <td> {{item.year}}</td>
+                <td>
+                    <button class="btn btn-danger" v-on:click="removeMovie(index,item)">Delete</button>
+                    <button class="btn btn-primary" v-on:click="editMovie(index,item)">Edit</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+</div>
+
+@section styles{ 
+    <link href="~/lib/toastr/toastr.css" rel="stylesheet" />
+}
+
+@section scripts{
+    <script src="~/lib/toastr/toastr.min.js"></script>
+    <script>
+
+        var app = new Vue({
+            el: "#app",
+            data: {
+                movieList: [],
+                name: "",
+                year: null,
+                id: null,
+                index: null,
+                editMode:false
+            },
+            mounted: function () {
+                console.log("Mouted");
+                this.getMovieList();
+            },
+
+            methods: {
+                cancelEditMovie: function () {
+                    var vm = this;
+                    vm.editMode = false;
+                    vm.id = null;
+                    vm.name = "";
+                    vm.year = null;
+                    vm.index = null;
+                },
+                updateMovie: function () {
+                    var vm = this;
+
+                    var selectedMovie = {
+                        id:vm.id,
+                        name: vm.name,
+                        year: vm.year
+                    }
+
+                    $.ajax({
+                        url: "/api/movie",
+                        method: "PUT",
+                        contentType: "application/json",
+                        data: JSON.stringify(selectedMovie)
+                    }).done(function () {
+                        console.log("done");
+                        vm.movieList[vm.index].name = vm.name;
+                        vm.movieList[vm.index].year = vm.year;
+                        toastr.success("Movie updated.");
+
+                    }).fail(function () {
+                        toastr.error("Error updating movie!");
+                    }).always(function () {
+                        vm.editMode = false;
+                        vm.name = "";
+                        vm.year = null;
+                    });
+
+               
+                },
+                editMovie: function (index, selectedMovie) {
+                    var vm = this;
+                    vm.editMode = true;
+                    vm.id = selectedMovie.id;
+                    vm.name = selectedMovie.name;
+                    vm.year = selectedMovie.year;
+                    vm.index = index;
+                },
+                removeMovie: function (index,selectedMovie) {
+                    var vm = this;
+                    
+
+                    $.ajax({
+                        url: "/api/movie",
+                        method: "DELETE",
+                        contentType: "application/json",
+                        data: JSON.stringify(selectedMovie)
+                    }).done(function () {
+                        console.log("done");
+                        vm.movieList.splice(index, 1);
+                        toastr.success("Movie removed.");
+
+                    }).fail(function () {
+                        toastr.error("Error removing movie!");
+                    });
+
+                },
+                addMovie: function () {
+                    var vm = this;
+
+                    var newMovie = {
+                        name: vm.name,
+                        year: vm.year
+                    }
+
+                    $.ajax({
+                        url: "/api/movie",
+                        method: "POST",
+                        contentType:"application/json",
+                        data: JSON.stringify(newMovie)
+                    }).done(function () {
+                        console.log("done");
+                        vm.movieList.splice(0, 0, newMovie);  
+                        toastr.success("Movie added.");
+
+                    }).fail(function () {
+                        toastr.error("Error!");
+                    }).always(function () {
+                        vm.name = "";
+                        vm.year = null;
+                    });
+
+                
+                },
+                getMovieList: function () {
+                    console.log("Getting Movie List");
+
+                    var vm = this;
+
+                    $.ajax({ url: "/api/movie", method: "GET" })
+                        .done(function (data) {
+                            vm.movieList = data;
+                            console.table(data);
+                        })
+
+                }
+            }
+        });
+
+    </script>
+}
