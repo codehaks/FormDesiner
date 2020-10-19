@@ -1,10 +1,9 @@
-﻿@page
-@model MyApp.IndexModel
+﻿@page "{id}"
+@model MyApp.Pages.DesignModel
 @{
-    ViewData["Title"] = "Home";
 }
 
-<h1>Forms</h1>
+<h1>Design</h1>
 <hr />
 
 <div id="app">
@@ -12,8 +11,8 @@
     <div class="card border-primary">
         <div class="card-header">
             <span v-if="editMode">Edit Form</span>
-            <span v-else>Add New Form</span>
-            
+            <span v-else>Add New Field</span>
+
         </div>
         <div class="card-body">
             <input v-model="name" name="Name" placeholder="Name" class="form-control" />
@@ -33,7 +32,7 @@
             </tr>
         </thead>
         <tbody>
-            
+
             <tr v-for="(item,index) in movieList">
                 <td>
                     {{index+1}}
@@ -52,7 +51,7 @@
 
 </div>
 
-@section styles{ 
+@section styles{
     <link href="~/lib/toastr/toastr.css" rel="stylesheet" />
 }
 
@@ -64,6 +63,7 @@
             el: "#app",
             data: {
                 movieList: [],
+                formId:'@Model.Id',
                 name: "",
                 id: null,
                 index: null,
@@ -91,7 +91,7 @@
                     }
 
                     $.ajax({
-                        url: "/api/movie",
+                        url: "/api/entery",
                         method: "PUT",
                         contentType: "application/json",
                         data: JSON.stringify(selectedMovie)
@@ -107,7 +107,7 @@
                         vm.name = "";
                     });
 
-               
+
                 },
                 editMovie: function (index, selectedMovie) {
                     var vm = this;
@@ -118,10 +118,10 @@
                 },
                 removeMovie: function (index,selectedMovie) {
                     var vm = this;
-                    
+
 
                     $.ajax({
-                        url: "/api/movie",
+                        url: "/api/entery",
                         method: "DELETE",
                         contentType: "application/json",
                         data: JSON.stringify(selectedMovie)
@@ -139,33 +139,34 @@
                     var vm = this;
 
                     var newMovie = {
+                        formId:vm.formId,
                         name: vm.name,
                     }
 
                     $.ajax({
-                        url: "/api/movie",
+                        url: "/api/entery",
                         method: "POST",
                         contentType:"application/json",
                         data: JSON.stringify(newMovie)
                     }).done(function () {
                         console.log("done");
-                        vm.movieList.splice(0, 0, newMovie);  
+                        vm.movieList.splice(0, 0, newMovie);
                         toastr.success("added.");
 
                     }).fail(function () {
                         toastr.error("Error!");
                     }).always(function () {
-                        vm.name = "";
+                       vm.name = "";
                     });
 
-                
+
                 },
                 getMovieList: function () {
                     console.log("Getting List");
 
                     var vm = this;
 
-                    $.ajax({ url: "/api/movie", method: "GET" })
+                    $.ajax({ url: "/api/entery/"+vm.formId, method: "GET" })
                         .done(function (data) {
                             vm.movieList = data;
                             console.table(data);
